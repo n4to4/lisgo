@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -13,11 +12,34 @@ func TestTokenize(t *testing.T) {
 		"(", "*", "pi", "(", "*", "r", "r", ")", ")", ")",
 	}
 
-	for _, s := range got {
-		fmt.Printf("'%s' ", s)
-	}
-
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v want %v", got, want)
+	}
+}
+
+func TestReadTokens(t *testing.T) {
+	cases := []struct {
+		tokens   []string
+		expected Exp
+	}{
+		{
+			tokens:   []string{"pi"},
+			expected: Symbol{"pi"},
+		},
+		{
+			tokens:   []string{"(", "define", "r", "10", ")"},
+			expected: List{[]Exp{Symbol{"define"}, Symbol{"r"}, Number{10}}},
+		},
+	}
+
+	for _, c := range cases {
+		got, err := readFromTokens(c.tokens)
+		if err != nil {
+			t.Fatalf("want no error, got %v", err)
+		}
+
+		if !reflect.DeepEqual(got, c.expected) {
+			t.Errorf("got %+v want %+v", got, c.expected)
+		}
 	}
 }
