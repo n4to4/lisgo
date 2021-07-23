@@ -51,7 +51,9 @@ func readFromTokens(tokens []string) (Exp, error) {
 	if tokens[0] == "(" {
 		var list []Exp
 		for i := 1; tokens[i] != ")"; i++ {
-			list = append(list, atom(tokens[i]))
+			//list = append(list, atom(tokens[i]))
+			t, _ := readFromTokens(tokens[i:])
+			list = append(list, t)
 		}
 		return List{list}, nil
 	} else if tokens[0] == ")" {
