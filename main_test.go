@@ -23,12 +23,12 @@ func TestReadTokens(t *testing.T) {
 		expected Exp
 	}{
 		{
-			tokens:   []string{"pi"},
-			expected: Symbol{"pi"},
+			tokens("pi"),
+			expected(Symbol{"pi"}),
 		},
 		{
-			tokens:   []string{"(", "define", "r", "10", ")"},
-			expected: List{[]Exp{Symbol{"define"}, Symbol{"r"}, Number{10}}},
+			tokens("(", "define", "r", "10", ")"),
+			expected(Symbol{"define"}, Symbol{"r"}, Number{10}),
 		},
 	}
 
@@ -41,5 +41,20 @@ func TestReadTokens(t *testing.T) {
 		if !reflect.DeepEqual(got, c.expected) {
 			t.Errorf("got %+v want %+v", got, c.expected)
 		}
+	}
+}
+
+func tokens(args ...string) []string {
+	return args
+}
+
+func expected(args ...Exp) Exp {
+	switch len(args) {
+	case 0:
+		panic("invalid")
+	case 1:
+		return args[0]
+	default:
+		return List{args}
 	}
 }
