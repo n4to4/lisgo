@@ -44,22 +44,33 @@ func tokenize(input string) []string {
 }
 
 func readFromTokens(tokens []string) (Exp, error) {
+	exp, _, err := readInternal(tokens)
+	return exp, err
+}
+
+func readInternal(tokens []string) (Exp, int, error) {
 	if len(tokens) == 0 {
-		return nil, errors.New("empty tokens")
+		return nil, 0, errors.New("empty tokens")
 	}
 
-	if tokens[0] == "(" {
+	idx := 0
+	if tokens[idx] == "(" {
 		var list []Exp
-		for i := 1; tokens[i] != ")"; i++ {
-			//list = append(list, atom(tokens[i]))
-			t, _ := readFromTokens(tokens[i:])
-			list = append(list, t)
+		for idx = 1; tokens[idx] != ")"; {
+			exp, n, err := readInternal(tokens[idx:])
+			if err != nil {
+				return nil, 0, err
+			}
+
+			list = append(list, exp)
+			idx += n
 		}
-		return List{list}, nil
+		idx += 1 // pop off `(`
+		return List{list}, idx, nil
 	} else if tokens[0] == ")" {
-		return nil, errors.New("unexpected")
+		return nil, 0, errors.New("unexpected")
 	} else {
-		return atom(tokens[0]), nil
+		return atom(tokens[0]), 1, nil
 	}
 }
 
