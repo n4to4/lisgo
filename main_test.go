@@ -64,7 +64,7 @@ func TestReadTokens(t *testing.T) {
 func TestEnv(t *testing.T) {
 	t.Run("plus", func(t *testing.T) {
 		env := NewEnv()
-		env.update("+", func(x, y int) int { return x + y })
+		env.update("+", BinaryFunc{func(x, y int) int { return x + y }})
 
 		fn := mustFindBinaryFunc(t, env, "+")
 
@@ -78,7 +78,7 @@ func TestEnv(t *testing.T) {
 
 	t.Run("minus", func(t *testing.T) {
 		env := NewEnv()
-		env.update("-", func(x, y int) int { return x - y })
+		env.update("-", BinaryFunc{func(x, y int) int { return x - y }})
 
 		fn := mustFindBinaryFunc(t, env, "-")
 
@@ -87,6 +87,18 @@ func TestEnv(t *testing.T) {
 
 		if got != want {
 			t.Errorf("got %d want %d", got, want)
+		}
+	})
+
+	t.Run("variable", func(t *testing.T) {
+		env := NewEnv()
+		env.update("pi", Number{3.141592})
+
+		got := mustFindNumber(t, env, "pi")
+		want := Number{3.141592}
+
+		if got != want {
+			t.Errorf("got %v want %v", got, want)
 		}
 	})
 }
@@ -107,10 +119,8 @@ func list(args ...Exp) Exp {
 }
 
 func mustFindBinaryFunc(t testing.TB, env *Env, name string) BinaryFunc {
-	obj := env.find(name)
-	if obj == nil {
-		t.Fatal("want function object, got nil")
-	}
+	t.Helper()
+	obj := mustFind(t, env, name)
 
 	fn, ok := obj.(BinaryFunc)
 	if !ok {
@@ -118,4 +128,24 @@ func mustFindBinaryFunc(t testing.TB, env *Env, name string) BinaryFunc {
 	}
 
 	return fn
+}
+
+func mustFindNumber(t testing.TB, env *Env, name string) Number {
+	t.Helper()
+	obj := mustFind(t, env, name)
+
+	number, ok := obj.(Number)
+	if !ok {
+		t.Fatal("want number")
+	}
+
+	return number
+}
+
+func mustFind(t testing.TB, env *Env, name string) Exp {
+	obj := env.find(name)
+	if obj == nil {
+		t.Fatal("want obj got nil")
+	}
+	return obj
 }
