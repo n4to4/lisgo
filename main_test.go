@@ -61,6 +61,28 @@ func TestReadTokens(t *testing.T) {
 	}
 }
 
+func TestEnv(t *testing.T) {
+	env := NewEnv()
+	env.update("+", func(x, y int) int { return x + y })
+
+	plus := env.find("+")
+	if plus == nil {
+		t.Fatal("want function object, got nil")
+	}
+
+	fn, ok := plus.(BinaryFunc)
+	if !ok {
+		t.Fatal("want binary func")
+	}
+
+	got := fn.f(1, 3)
+	want := 4
+
+	if got != want {
+		t.Errorf("got %d want %d", got, want)
+	}
+}
+
 func tokens(args ...string) []string {
 	return args
 }

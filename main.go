@@ -82,3 +82,28 @@ func atom(token string) Exp {
 		return Number{num}
 	}
 }
+
+// Env
+
+type Env struct{}
+
+func NewEnv() *Env {
+	return nil
+}
+
+func (e *Env) update(symbol string, value interface{}) {
+}
+
+func (e *Env) find(symbol string) interface{} {
+	return BinaryFunc{func(x, y int) int { return x + y }}
+}
+
+// Functions
+
+type BinaryFunc struct {
+	f func(int, int) int
+}
+
+func (f BinaryFunc) Value() string {
+	return "binary func"
+}
