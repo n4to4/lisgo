@@ -90,8 +90,14 @@ type Env struct {
 }
 
 func NewEnv() *Env {
-	envmap := make(map[string]Exp)
-	return &Env{envmap}
+	stdenv := standardEnv()
+	return &Env{stdenv}
+}
+
+func standardEnv() map[string]Exp {
+	env := make(map[string]Exp)
+	env["pi"] = Number{3.141592}
+	return env
 }
 
 func (e *Env) update(name string, exp Exp) {
@@ -110,4 +116,19 @@ type BinaryFunc struct {
 
 func (f BinaryFunc) Value() string {
 	return "binary func"
+}
+
+// Interpreter
+
+type Interpreter struct {
+	env *Env
+}
+
+func (i *Interpreter) eval(exp Exp) Exp {
+	switch v := exp.(type) {
+	case Symbol:
+		return i.env.envmap[v.name]
+	default:
+		return nil
+	}
 }

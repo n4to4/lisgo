@@ -103,6 +103,19 @@ func TestEnv(t *testing.T) {
 	})
 }
 
+func TestEval(t *testing.T) {
+	env := NewEnv()
+	interpreter := Interpreter{env}
+
+	t.Run("symbol", func(t *testing.T) {
+		got := interpreter.eval(Symbol{"pi"})
+		want := Number{3.141592}
+		if got != want {
+			t.Errorf("want %v, got %v", want, got)
+		}
+	})
+}
+
 func tokens(args ...string) []string {
 	return args
 }
