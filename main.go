@@ -85,17 +85,21 @@ func atom(token string) Exp {
 
 // Env
 
-type Env struct{}
+type Env struct {
+	envmap map[string]BinaryFunc
+}
 
 func NewEnv() *Env {
-	return nil
+	envmap := make(map[string]BinaryFunc)
+	return &Env{envmap}
 }
 
-func (e *Env) update(symbol string, value interface{}) {
+func (e *Env) update(name string, fn func(int, int) int) {
+	e.envmap[name] = BinaryFunc{fn}
 }
 
-func (e *Env) find(symbol string) interface{} {
-	return BinaryFunc{func(x, y int) int { return x + y }}
+func (e *Env) find(name string) interface{} {
+	return e.envmap[name]
 }
 
 // Functions
