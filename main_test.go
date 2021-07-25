@@ -64,11 +64,11 @@ func TestReadTokens(t *testing.T) {
 func TestEnv(t *testing.T) {
 	t.Run("plus", func(t *testing.T) {
 		env := NewEnv()
-		env.update("+", BinaryFunc{func(x, y float64) float64 { return x + y }})
+		env.update("+", BinaryFunc(func(x, y float64) float64 { return x + y }))
 
 		fn := mustFindBinaryFunc(t, env, "+")
 
-		got := fn.f(1, 3)
+		got := fn(1, 3)
 		want := 4.0
 
 		if got != want {
@@ -78,11 +78,11 @@ func TestEnv(t *testing.T) {
 
 	t.Run("minus", func(t *testing.T) {
 		env := NewEnv()
-		env.update("-", BinaryFunc{func(x, y float64) float64 { return x - y }})
+		env.update("-", BinaryFunc(func(x, y float64) float64 { return x - y }))
 
 		fn := mustFindBinaryFunc(t, env, "-")
 
-		got := fn.f(3, 1)
+		got := fn(3, 1)
 		want := 2.0
 
 		if got != want {
