@@ -138,19 +138,19 @@ func TestEval(t *testing.T) {
 		}
 	})
 
-	//t.Run("proc call", func(t *testing.T) {
-	//	interp := NewInterpreter()
-	//	got := interp.eval(list(
-	//		Symbol{"*"},
-	//		Number(2),
-	//		Number(3),
-	//	))
-	//	want := Number(6)
+	t.Run("proc call", func(t *testing.T) {
+		interp := NewInterpreter()
+		got := interp.eval(list(
+			Symbol("*"),
+			Number(2),
+			Number(3),
+		))
+		want := Number(6)
 
-	//	if got != want {
-	//		t.Errorf("want %v, got %v", got, want)
-	//	}
-	//})
+		if got != want {
+			t.Errorf("want %v, got %v", got, want)
+		}
+	})
 }
 
 func tokens(args ...string) []string {

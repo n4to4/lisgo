@@ -91,6 +91,7 @@ func NewEnv() *Env {
 func standardEnv() map[string]Exp {
 	env := make(map[string]Exp)
 	env["pi"] = Number(3.141592)
+	env["*"] = BinaryFunc(func(x, y float64) float64 { return x * y })
 	return env
 }
 
@@ -141,6 +142,7 @@ func (i *Interpreter) eval(exp Exp) Exp {
 
 func (i *Interpreter) evalList(list List) Exp {
 	switch v := list[0].(type) {
+
 	case Symbol:
 		head := list[0].(Symbol)
 		kDef := Symbol("define")
@@ -149,13 +151,23 @@ func (i *Interpreter) evalList(list List) Exp {
 			sym := list[1].(Symbol)
 			exp := list[2]
 			i.env.envmap[string(sym)] = i.eval(exp)
+			return nil
+		} else {
+			proc := i.eval(head)
+			evaled := List{proc}
+			for _, exp := range list[1:] {
+				evaled = append(evaled, i.eval(exp))
+			}
+			return i.eval(evaled)
 		}
+
 	case BinaryFunc:
 		x := list[1].(Number)
 		y := list[2].(Number)
 		val := v(float64(x), float64(y))
 		return Number(val)
-	}
 
-	return nil
+	default:
+		return nil
+	}
 }
