@@ -164,7 +164,7 @@ func list(args ...Exp) Exp {
 	case 1:
 		return args[0]
 	default:
-		return List{args}
+		return List(args)
 	}
 }
 

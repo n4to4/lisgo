@@ -16,9 +16,7 @@ type Symbol string
 
 type Number float64
 
-type List struct {
-	exps []Exp
-}
+type List []Exp
 
 func (s Symbol) Value() string {
 	return string(s)
@@ -29,7 +27,7 @@ func (n Number) Value() string {
 }
 
 func (l List) Value() string {
-	return fmt.Sprintf("%+v", l.exps)
+	return fmt.Sprintf("%+v", l)
 }
 
 func tokenize(input string) []string {
@@ -62,7 +60,7 @@ func readInternal(tokens []string) (Exp, int, error) {
 			idx += n
 		}
 		idx += 1 // pop off `(`
-		return List{list}, idx, nil
+		return List(list), idx, nil
 	} else if tokens[0] == ")" {
 		return nil, 0, errors.New("unexpected")
 	} else {
@@ -142,19 +140,19 @@ func (i *Interpreter) eval(exp Exp) Exp {
 }
 
 func (i *Interpreter) evalList(list List) Exp {
-	switch v := list.exps[0].(type) {
+	switch v := list[0].(type) {
 	case Symbol:
-		head := list.exps[0].(Symbol)
+		head := list[0].(Symbol)
 		kDef := Symbol("define")
 
 		if head == kDef {
-			sym := list.exps[1].(Symbol)
-			exp := list.exps[2]
+			sym := list[1].(Symbol)
+			exp := list[2]
 			i.env.envmap[string(sym)] = i.eval(exp)
 		}
 	case BinaryFunc:
-		x := list.exps[1].(Number)
-		y := list.exps[2].(Number)
+		x := list[1].(Number)
+		y := list[2].(Number)
 		val := v(float64(x), float64(y))
 		return Number(val)
 	}
