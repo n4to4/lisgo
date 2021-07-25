@@ -92,6 +92,7 @@ func standardEnv() map[string]Exp {
 	env := make(map[string]Exp)
 	env["pi"] = Number(3.141592)
 	env["*"] = BinaryFunc(func(x, y float64) float64 { return x * y })
+	env["begin"] = VariadicFunc(func(exps ...Exp) Exp { return exps[len(exps)-1] })
 	return env
 }
 
@@ -109,6 +110,12 @@ type BinaryFunc func(float64, float64) float64
 
 func (f BinaryFunc) Value() string {
 	return "binary func"
+}
+
+type VariadicFunc func(exps ...Exp) Exp
+
+func (f VariadicFunc) Value() string {
+	return "variadic func"
 }
 
 // Interpreter
@@ -150,8 +157,10 @@ func (i *Interpreter) evalList(list List) Exp {
 		if head == kDef {
 			sym := list[1].(Symbol)
 			exp := list[2]
-			i.env.envmap[string(sym)] = i.eval(exp)
-			return nil
+			evaled := i.eval(exp)
+			i.env.envmap[string(sym)] = evaled
+
+			return evaled
 		} else {
 			proc := i.eval(head)
 			evaled := List{proc}
@@ -166,6 +175,13 @@ func (i *Interpreter) evalList(list List) Exp {
 		y := list[2].(Number)
 		val := v(float64(x), float64(y))
 		return Number(val)
+
+	case VariadicFunc:
+		var exps List
+		for _, exp := range list[1:] {
+			exps = append(exps, i.eval(exp))
+		}
+		return v(exps...)
 
 	default:
 		return nil

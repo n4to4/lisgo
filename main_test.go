@@ -148,7 +148,21 @@ func TestEval(t *testing.T) {
 		want := Number(6)
 
 		if got != want {
-			t.Errorf("want %v, got %v", got, want)
+			t.Errorf("want %v, got %v", want, got)
+		}
+	})
+
+	t.Run("variadic func", func(t *testing.T) {
+		interp := NewInterpreter()
+		got := interp.eval(list(
+			Symbol("begin"),
+			list(Symbol("define"), Symbol("r"), Number(3)),
+			Symbol("r"),
+		))
+		want := Number(3)
+
+		if got != want {
+			t.Errorf("want %v, got %v", want, got)
 		}
 	})
 }
