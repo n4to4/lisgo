@@ -111,7 +111,7 @@ func (e *Env) find(name string) Exp {
 // Functions
 
 type BinaryFunc struct {
-	f func(int, int) int
+	f func(float64, float64) float64
 }
 
 func (f BinaryFunc) Value() string {
@@ -161,8 +161,8 @@ func (i *Interpreter) evalList(list List) Exp {
 	case BinaryFunc:
 		x := list.exps[1].(Number)
 		y := list.exps[2].(Number)
-		val := v.f(int(x.value), int(y.value))
-		return Number{float64(val)}
+		val := v.f(x.value, (y.value))
+		return Number{val}
 	}
 
 	return nil
