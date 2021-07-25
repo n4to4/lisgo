@@ -26,12 +26,12 @@ func TestReadTokens(t *testing.T) {
 		{
 			"atom",
 			tokens("pi"),
-			list(Symbol{"pi"}),
+			list(Symbol("pi")),
 		},
 		{
 			"list",
 			tokens("(", "define", "r", "10", ")"),
-			list(Symbol{"define"}, Symbol{"r"}, Number{10}),
+			list(Symbol("define"), Symbol("r"), Number(10)),
 		},
 		{
 			"nested",
@@ -40,9 +40,9 @@ func TestReadTokens(t *testing.T) {
 				"(", "*", "pi", "(", "*", "r", "r", ")", ")", ")",
 			),
 			list(
-				Symbol{"begin"},
-				list(Symbol{"define"}, Symbol{"r"}, Number{10}),
-				list(Symbol{"*"}, Symbol{"pi"}, list(Symbol{"*"}, Symbol{"r"}, Symbol{"r"})),
+				Symbol("begin"),
+				list(Symbol("define"), Symbol("r"), Number(10)),
+				list(Symbol("*"), Symbol("pi"), list(Symbol("*"), Symbol("r"), Symbol("r"))),
 			),
 		},
 	}
@@ -92,10 +92,10 @@ func TestEnv(t *testing.T) {
 
 	t.Run("variable", func(t *testing.T) {
 		env := NewEnv()
-		env.update("pi", Number{3.141592})
+		env.update("pi", Number(3.141592))
 
 		got := mustFindNumber(t, env, "pi")
-		want := Number{3.141592}
+		want := Number(3.141592)
 
 		if got != want {
 			t.Errorf("got %v want %v", got, want)
@@ -106,8 +106,8 @@ func TestEnv(t *testing.T) {
 func TestEval(t *testing.T) {
 	t.Run("symbol", func(t *testing.T) {
 		interp := NewInterpreter()
-		got := interp.eval(Symbol{"pi"})
-		want := Number{3.141592}
+		got := interp.eval(Symbol("pi"))
+		want := Number(3.141592)
 		if got != want {
 			t.Errorf("want %v, got %v", want, got)
 		}
@@ -115,8 +115,8 @@ func TestEval(t *testing.T) {
 
 	t.Run("number", func(t *testing.T) {
 		interp := NewInterpreter()
-		got := interp.eval(Number{1.23})
-		want := Number{1.23}
+		got := interp.eval(Number(1.23))
+		want := Number(1.23)
 		if got != want {
 			t.Errorf("want %v, got %v", want, got)
 		}
@@ -125,13 +125,13 @@ func TestEval(t *testing.T) {
 	t.Run("define", func(t *testing.T) {
 		interp := NewInterpreter()
 		interp.eval(list(
-			Symbol{"define"},
-			Symbol{"r"},
-			Number{10},
+			Symbol("define"),
+			Symbol("r"),
+			Number(10),
 		))
 
 		got := interp.env.find("r")
-		want := Number{10}
+		want := Number(10)
 
 		if got != want {
 			t.Errorf("want %v, got %v", want, got)
@@ -142,10 +142,10 @@ func TestEval(t *testing.T) {
 	//	interp := NewInterpreter()
 	//	got := interp.eval(list(
 	//		Symbol{"*"},
-	//		Number{2},
-	//		Number{3},
+	//		Number(2),
+	//		Number(3),
 	//	))
-	//	want := Number{6}
+	//	want := Number(6)
 
 	//	if got != want {
 	//		t.Errorf("want %v, got %v", got, want)

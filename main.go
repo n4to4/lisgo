@@ -12,24 +12,20 @@ type Exp interface {
 	Value() string
 }
 
-type Symbol struct {
-	name string
-}
+type Symbol string
 
-type Number struct {
-	value float64
-}
+type Number float64
 
 type List struct {
 	exps []Exp
 }
 
 func (s Symbol) Value() string {
-	return s.name
+	return string(s)
 }
 
 func (n Number) Value() string {
-	return fmt.Sprintf("%f", n.value)
+	return fmt.Sprintf("%f", float64(n))
 }
 
 func (l List) Value() string {
@@ -77,9 +73,9 @@ func readInternal(tokens []string) (Exp, int, error) {
 func atom(token string) Exp {
 	num, err := strconv.ParseFloat(token, 64)
 	if err != nil {
-		return Symbol{token}
+		return Symbol(token)
 	} else {
-		return Number{num}
+		return Number(num)
 	}
 }
 
@@ -96,7 +92,7 @@ func NewEnv() *Env {
 
 func standardEnv() map[string]Exp {
 	env := make(map[string]Exp)
-	env["pi"] = Number{3.141592}
+	env["pi"] = Number(3.141592)
 	return env
 }
 
@@ -131,7 +127,7 @@ func (i *Interpreter) eval(exp Exp) Exp {
 	switch v := exp.(type) {
 	// variable reference
 	case Symbol:
-		return i.env.envmap[v.name]
+		return i.env.envmap[string(v)]
 
 	// constant number
 	case Number:
@@ -149,18 +145,18 @@ func (i *Interpreter) evalList(list List) Exp {
 	switch v := list.exps[0].(type) {
 	case Symbol:
 		head := list.exps[0].(Symbol)
-		kDef := Symbol{"define"}
+		kDef := Symbol("define")
 
 		if head == kDef {
 			sym := list.exps[1].(Symbol)
 			exp := list.exps[2]
-			i.env.envmap[sym.name] = i.eval(exp)
+			i.env.envmap[string(sym)] = i.eval(exp)
 		}
 	case BinaryFunc:
 		x := list.exps[1].(Number)
 		y := list.exps[2].(Number)
-		val := v(x.value, (y.value))
-		return Number{val}
+		val := v(float64(x), float64(y))
+		return Number(val)
 	}
 
 	return nil
