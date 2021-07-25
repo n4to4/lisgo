@@ -104,16 +104,53 @@ func TestEnv(t *testing.T) {
 }
 
 func TestEval(t *testing.T) {
-	env := NewEnv()
-	interpreter := Interpreter{env}
-
 	t.Run("symbol", func(t *testing.T) {
-		got := interpreter.eval(Symbol{"pi"})
+		interp := NewInterpreter()
+		got := interp.eval(Symbol{"pi"})
 		want := Number{3.141592}
 		if got != want {
 			t.Errorf("want %v, got %v", want, got)
 		}
 	})
+
+	t.Run("number", func(t *testing.T) {
+		interp := NewInterpreter()
+		got := interp.eval(Number{1.23})
+		want := Number{1.23}
+		if got != want {
+			t.Errorf("want %v, got %v", want, got)
+		}
+	})
+
+	t.Run("define", func(t *testing.T) {
+		interp := NewInterpreter()
+		interp.eval(list(
+			Symbol{"define"},
+			Symbol{"r"},
+			Number{10},
+		))
+
+		got := interp.env.find("r")
+		want := Number{10}
+
+		if got != want {
+			t.Errorf("want %v, got %v", want, got)
+		}
+	})
+
+	//t.Run("proc call", func(t *testing.T) {
+	//	interp := NewInterpreter()
+	//	got := interp.eval(list(
+	//		Symbol{"*"},
+	//		Number{2},
+	//		Number{3},
+	//	))
+	//	want := Number{6}
+
+	//	if got != want {
+	//		t.Errorf("want %v, got %v", got, want)
+	//	}
+	//})
 }
 
 func tokens(args ...string) []string {

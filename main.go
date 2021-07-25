@@ -124,11 +124,46 @@ type Interpreter struct {
 	env *Env
 }
 
+func NewInterpreter() *Interpreter {
+	env := NewEnv()
+	return &Interpreter{env}
+}
+
 func (i *Interpreter) eval(exp Exp) Exp {
 	switch v := exp.(type) {
+	// variable reference
 	case Symbol:
 		return i.env.envmap[v.name]
+
+	// constant number
+	case Number:
+		return exp
+
+	case List:
+		return i.evalList(v)
+
 	default:
 		return nil
 	}
+}
+
+func (i *Interpreter) evalList(list List) Exp {
+	switch v := list.exps[0].(type) {
+	case Symbol:
+		head := list.exps[0].(Symbol)
+		kDef := Symbol{"define"}
+
+		if head == kDef {
+			sym := list.exps[1].(Symbol)
+			exp := list.exps[2]
+			i.env.envmap[sym.name] = i.eval(exp)
+		}
+	case BinaryFunc:
+		x := list.exps[1].(Number)
+		y := list.exps[2].(Number)
+		val := v.f(int(x.value), int(y.value))
+		return Number{float64(val)}
+	}
+
+	return nil
 }
