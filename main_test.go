@@ -167,6 +167,21 @@ func TestEval(t *testing.T) {
 	})
 }
 
+func TestParseAndEval(t *testing.T) {
+	interp := NewInterpreter()
+	input := "(begin (define r 10) (* pi (* r r)))"
+	parsed, err := readFromTokens(tokenize(input))
+	if err != nil {
+		t.Fatalf("want no error, got %v", err)
+	}
+	got := interp.eval(parsed)
+	want := Number(314.1592)
+
+	if got != want {
+		t.Errorf("want %f got %f", want, got)
+	}
+}
+
 func tokens(args ...string) []string {
 	return args
 }
